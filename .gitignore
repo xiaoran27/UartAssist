@@ -1,0 +1,11 @@
+UartAssist/.vs
+*.user
+UartAssist/Release
+UartAssist/Debug
+UartAssist/debug.log
+UartAssist/x64
+UartAssist/Win32
+UartAssist/UartAssist/GeneratedFiles
+UartAssist/UartAssist/x64
+UartAssist/UartAssist/Debug
+UartAssist/UartAssist/Release
