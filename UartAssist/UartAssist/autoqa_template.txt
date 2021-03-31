@@ -42,9 +42,31 @@
 # | n |  n |  n |  =>nn1  |
 
 # 设置消息类型和应答延时时间
-t1
+t0
 s1000
 
 # 连接后需发送应答
-#< 
-#<
+< 欢迎连接Xxx
+< Welcome come to Xxxx
+
+= echo equal
+
+> give me a answer
+< one answer
+
+> give me more answer
+< first answer
+< second answer
+< ... answer
+< more answer
+
+> first question for same answer
+> second question for same answer
+< the same answer
+
+> give me some Hex answer
+> 16
+> hex: 31 36
+< 0123456789ABCDEFabcdef
+< hex: 30 31 32 33 34 35 36 37 38 39 41 42 43 44 45 46 61 62 63 64 65 66
+< hex: 30313233343536373839414243444546616263646566
