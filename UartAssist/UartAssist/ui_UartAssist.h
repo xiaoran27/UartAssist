@@ -1,4 +1,4 @@
-#ifndef UI_UARTASSIST_H
+﻿#ifndef UI_UARTASSIST_H
 #define UI_UARTASSIST_H
 
 #include <qapplication.h>
@@ -78,6 +78,7 @@ public:
 	QRadioButton *transmitterAscii;
 	QRadioButton *transmitterHex;
 	QCheckBox *transmitterNewLine;
+	QCheckBox* transmitterAutoQA;
 	QCheckBox *transmitterAuto;
 	QLabel *transmitterEvery;
 	QLineEdit *transmitterPeriod;

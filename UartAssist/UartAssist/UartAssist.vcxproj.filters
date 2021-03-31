@@ -51,14 +51,12 @@
     <ClCompile Include="UartAssist.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    
-    
-    
     <ClCompile Include="ui_UartAssist.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    
-    
+    <ClCompile Include="AutoQA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="UartAssist.h">
@@ -78,5 +76,10 @@
     <None Include="uartassist_zh.ts">
       <Filter>Translation Files</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="AutoQA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

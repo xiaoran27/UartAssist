@@ -1,4 +1,4 @@
-#include "ui_UartAssist.h"
+ï»¿#include "ui_UartAssist.h"
 
 UI_UartAssist::UI_UartAssist(QWidget *parent) : QMainWindow(parent) {
 	centralWidget = new QWidget(parent);
@@ -44,6 +44,7 @@ UI_UartAssist::UI_UartAssist(QWidget *parent) : QMainWindow(parent) {
 	transmitterAscii = new QRadioButton(tr("ASCII", "transmitter"), transmitterOptions);
 	transmitterHex = new QRadioButton(tr("Hex", "transmitter"), transmitterOptions);
 	transmitterNewLine = new QCheckBox(tr("Append \"\\r\\n\""), transmitterOptions);
+	transmitterAutoQA = new QCheckBox(tr("AutoQA"), transmitterOptions);
 	transmitterAuto = new QCheckBox(tr("Auto"), transmitterOptions);
 	transmitterEvery = new QLabel(tr("every"), transmitterOptions);
 	transmitterPeriod = new QLineEdit(transmitterOptions);
@@ -105,6 +106,7 @@ UI_UartAssist::~UI_UartAssist(void) {
 	transmitterAscii->deleteLater();
 	transmitterHex->deleteLater();
 	transmitterNewLine->deleteLater();
+	transmitterAutoQA->deleteLater();
 	transmitterAuto->deleteLater();
 	transmitterEvery->deleteLater();
 	transmitterPeriod->deleteLater();
@@ -120,61 +122,61 @@ UI_UartAssist::~UI_UartAssist(void) {
 }
 
 void UI_UartAssist::InitUI(QMainWindow *mainWindow) {
-	InitLayout(mainWindow); // ³õÊ¼»¯²¼¾Ö
-	InitStyle(mainWindow); // ³õÊ¼»¯ÑùÊ½
+	InitLayout(mainWindow); // åˆå§‹åŒ–å¸ƒå±€
+	InitStyle(mainWindow); // åˆå§‹åŒ–æ ·å¼
 }
 
 void UI_UartAssist::InitLayout(QMainWindow *mainWindow) {
-	/* Ö÷´°¿Ú */
-	mainWindow->setWindowIcon(QIcon(":/UartAssist.ico")); // Í¼±ê
-	mainWindow->setWindowTitle(tr("Uart Assist")); // ±êÌâ
+	/* ä¸»çª—å£ */
+	mainWindow->setWindowIcon(QIcon(":/UartAssist.ico")); // å›¾æ ‡
+	mainWindow->setWindowTitle(tr("Uart Assist")); // æ ‡é¢˜
 
-	/* ²¼¾Ö */
+	/* å¸ƒå±€ */
 	mainWindow->setCentralWidget(centralWidget);
 
-	centralWidget->setLayout(layout); // ÕûÌå²¼¾Ö
-	layout->addLayout(leftLayout); // ×ó°ë²¿·Ö²¼¾Ö
-	layout->addLayout(rightLayout); // ÓÒ°ë²¿·Ö²¼¾Ö
-	layout->setStretchFactor(leftLayout, 4); // ×ó°ë²¿·ÖÕ¼80%
-	layout->setStretchFactor(rightLayout, 1); // ÓÒ°ë²¿·ÖÕ¼20%
+	centralWidget->setLayout(layout); // æ•´ä½“å¸ƒå±€
+	layout->addLayout(leftLayout); // å·¦åŠéƒ¨åˆ†å¸ƒå±€
+	layout->addLayout(rightLayout); // å³åŠéƒ¨åˆ†å¸ƒå±€
+	layout->setStretchFactor(leftLayout, 4); // å·¦åŠéƒ¨åˆ†å 80%
+	layout->setStretchFactor(rightLayout, 1); // å³åŠéƒ¨åˆ†å 20%
 
-	rightLayout->addWidget(settings); // ²ÎÊıÉèÖÃ
+	rightLayout->addWidget(settings); // å‚æ•°è®¾ç½®
 	settings->setLayout(settingsLayout);
 
-	rightLayout->addWidget(receiverOptions); // ½ÓÊÕÑ¡Ïî
+	rightLayout->addWidget(receiverOptions); // æ¥æ”¶é€‰é¡¹
 	receiverOptions->setLayout(receiverOptionsLayout);
 
-	rightLayout->addWidget(transmitterOptions); // ·¢ËÍÑ¡Ïî
+	rightLayout->addWidget(transmitterOptions); // å‘é€é€‰é¡¹
 	transmitterOptions->setLayout(transmitterOptionsLayout);
 
-	rightLayout->addWidget(countBytes); // ¼ÆÊıÇø
+	rightLayout->addWidget(countBytes); // è®¡æ•°åŒº
 	countBytes->setLayout(countBytesLayout);
 
-	/* ½ÓÊÕÇø */
+	/* æ¥æ”¶åŒº */
 	leftLayout->addWidget(receiverArea);
-	leftLayout->setStretchFactor(receiverArea, 7); // ½ÓÊÕÇøÕ¼70%
-	receiverArea->setReadOnly(true); // ÉèÖÃÎªÖ»¶Á
-	receiverArea->setCenterOnScroll(true); // ×Ô¶¯¹ö¶¯Ê¹¹â±êÏÔÊ¾ÔÚÖĞÑë
+	leftLayout->setStretchFactor(receiverArea, 7); // æ¥æ”¶åŒºå 70%
+	receiverArea->setReadOnly(true); // è®¾ç½®ä¸ºåªè¯»
+	receiverArea->setCenterOnScroll(true); // è‡ªåŠ¨æ»šåŠ¨ä½¿å…‰æ ‡æ˜¾ç¤ºåœ¨ä¸­å¤®
 
-	/* ·¢ËÍÇø */
+	/* å‘é€åŒº */
 	leftLayout->addWidget(transmitterArea);
-	leftLayout->setStretchFactor(transmitterArea, 3); // ·¢ËÍÇøÕ¼30%
-	transmitterArea->addTab(transmitOne, tr("Transmit One")); // µ¥Ìõ·¢ËÍ
-	transmitterArea->addTab(transmitMore, tr("Transmit More")); // ¶àÌõ·¢ËÍ
-	transmitterArea->setTabPosition(QTabWidget::West); // ±êÇ©À¸ÔÚ×ó²à
-	transmitterArea->setUsesScrollButtons(false); // ²»Ê¹ÓÃ¹ö¶¯°´Å¥
+	leftLayout->setStretchFactor(transmitterArea, 3); // å‘é€åŒºå 30%
+	transmitterArea->addTab(transmitOne, tr("Transmit One")); // å•æ¡å‘é€
+	transmitterArea->addTab(transmitMore, tr("Transmit More")); // å¤šæ¡å‘é€
+	transmitterArea->setTabPosition(QTabWidget::West); // æ ‡ç­¾æ åœ¨å·¦ä¾§
+	transmitterArea->setUsesScrollButtons(false); // ä¸ä½¿ç”¨æ»šåŠ¨æŒ‰é’®
 
-	/* ¶àÌõ·¢ËÍ */
-	transmitMore->horizontalHeader()->setVisible(false); // Òş²ØÁĞ±êÌâ
-	transmitMore->verticalHeader()->setVisible(false); // Òş²ØĞĞ±êÌâ
-	transmitMore->setFrameShape(QFrame::NoFrame); // Òş²ØÍâ±ß¿ò
-	transmitMore->setShowGrid(false); // Òş²Øµ¥Ôª¸ñ±ß¿ò
-	transmitMore->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents); // ×ÔÊÊÓ¦ÁĞ¿í
-	transmitMore->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch); // À­ÉìµÚ1ÁĞ
-	transmitMore->horizontalHeader()->setSectionResizeMode(4, QHeaderView::Stretch); // À­ÉìµÚ4ÁĞ
-	transmitMore->verticalHeader()->setSectionResizeMode(QHeaderView::Stretch); // À­ÉìĞĞ¸ß
-	transmitMore->setEditTriggers(QAbstractItemView::NoEditTriggers); // ²»ÔÊĞí±à¼­
-	transmitMore->setSelectionMode(QAbstractItemView::NoSelection); // ²»ÔÊĞíÑ¡ÖĞ
+	/* å¤šæ¡å‘é€ */
+	transmitMore->horizontalHeader()->setVisible(false); // éšè—åˆ—æ ‡é¢˜
+	transmitMore->verticalHeader()->setVisible(false); // éšè—è¡Œæ ‡é¢˜
+	transmitMore->setFrameShape(QFrame::NoFrame); // éšè—å¤–è¾¹æ¡†
+	transmitMore->setShowGrid(false); // éšè—å•å…ƒæ ¼è¾¹æ¡†
+	transmitMore->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents); // è‡ªé€‚åº”åˆ—å®½
+	transmitMore->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch); // æ‹‰ä¼¸ç¬¬1åˆ—
+	transmitMore->horizontalHeader()->setSectionResizeMode(4, QHeaderView::Stretch); // æ‹‰ä¼¸ç¬¬4åˆ—
+	transmitMore->verticalHeader()->setSectionResizeMode(QHeaderView::Stretch); // æ‹‰ä¼¸è¡Œé«˜
+	transmitMore->setEditTriggers(QAbstractItemView::NoEditTriggers); // ä¸å…è®¸ç¼–è¾‘
+	transmitMore->setSelectionMode(QAbstractItemView::NoSelection); // ä¸å…è®¸é€‰ä¸­
 	for (int row = 0; row < transmitMore->rowCount(); ++row)
 		for (int col = 0; col < transmitMore->columnCount(); ++col)
 			switch (col % 3) {
@@ -183,59 +185,63 @@ void UI_UartAssist::InitLayout(QMainWindow *mainWindow) {
 			case 2: transmitMore->setCellWidget(row, col, new QPushButton(tr("Transmit"), transmitMore)); break;
 			}
 
-	/* ²ÎÊıÉèÖÃ */
-	settingsLayout->addRow(tr("COM"), settingCOM); // ´®¿ÚÑ¡Ôñ
-	settingsLayout->addRow(tr("Baud Rate"), settingBaudRate); // ²¨ÌØÂÊ
-	settingBaudRate->setEditable(true); // ²¨ÌØÂÊ¿É±à¼­
-	settingBaudRate->setValidator(settingBaudRateValidator); // Ö»ÄÜÊäÈë1ÖÁ10Î»Êı×Ö
-	settingsLayout->addRow(tr("Flow Control"), settingFlowCtrl); // Á÷¿ØÖÆ
-	settingsLayout->addRow(tr("Data Bits"), settingDataBits); // Êı¾İÎ»
-	settingsLayout->addRow(tr("Stop Bits"), settingStopBits); // Í£Ö¹Î»
-	settingsLayout->addRow(tr("Parity"), settingParity); // ÆæÅ¼Ğ£Ñé
-	settingsLayout->addRow(uartOnOff); // ´ò¿ª»ò¹Ø±Õ´®¿Ú
-	settingsLayout->addRow(uartRefresh); // Ë¢ĞÂ´®¿Ú
+	/* å‚æ•°è®¾ç½® */
+	settingsLayout->addRow(tr("COM"), settingCOM); // ä¸²å£é€‰æ‹©
+	settingsLayout->addRow(tr("Baud Rate"), settingBaudRate); // æ³¢ç‰¹ç‡
+	settingBaudRate->setEditable(true); // æ³¢ç‰¹ç‡å¯ç¼–è¾‘
+	settingBaudRate->setValidator(settingBaudRateValidator); // åªèƒ½è¾“å…¥1è‡³10ä½æ•°å­—
+	settingsLayout->addRow(tr("Flow Control"), settingFlowCtrl); // æµæ§åˆ¶
+	settingsLayout->addRow(tr("Data Bits"), settingDataBits); // æ•°æ®ä½
+	settingsLayout->addRow(tr("Stop Bits"), settingStopBits); // åœæ­¢ä½
+	settingsLayout->addRow(tr("Parity"), settingParity); // å¥‡å¶æ ¡éªŒ
+	settingsLayout->addRow(uartOnOff); // æ‰“å¼€æˆ–å…³é—­ä¸²å£
+	settingsLayout->addRow(uartRefresh); // åˆ·æ–°ä¸²å£
 
-	/* ½ÓÊÕÑ¡Ïî */
+	/* æ¥æ”¶é€‰é¡¹ */
 	receiverOptionsLayout->addLayout(receiverFormatLayout);
-	receiverFormatLayout->addWidget(receiverAscii); // ASCIIÏÔÊ¾
-	receiverAscii->setChecked(true); // Ä¬ÈÏÑ¡ÖĞASCII
-	receiverFormatLayout->addWidget(receiverHex); // 16½øÖÆÏÔÊ¾
-	receiverOptionsLayout->addWidget(receiverShowTime); // ÏÔÊ¾Ê±¼ä
-	receiverOptionsLayout->addWidget(receiverClear); // ÇåÆÁ
-	receiverOptionsLayout->addWidget(receiverSave); // ±£´æ
+	receiverFormatLayout->addWidget(receiverAscii); // ASCIIæ˜¾ç¤º
+	//receiverAscii->setChecked(true); // é»˜è®¤é€‰ä¸­ASCII
+	receiverFormatLayout->addWidget(receiverHex); // 16è¿›åˆ¶æ˜¾ç¤º
+	receiverHex->setChecked(true);
+	receiverOptionsLayout->addWidget(receiverShowTime); // æ˜¾ç¤ºæ—¶é—´
+	receiverShowTime->setChecked(true);
+	receiverOptionsLayout->addWidget(receiverClear); // æ¸…å±
+	receiverOptionsLayout->addWidget(receiverSave); // ä¿å­˜
 
-	/* ·¢ËÍÑ¡Ïî */
+	/* å‘é€é€‰é¡¹ */
 	transmitterOptionsLayout->addLayout(transmitterFormatLayout);
-	transmitterFormatLayout->addWidget(transmitterAscii); // ASCII·¢ËÍ
-	transmitterAscii->setChecked(true); // Ä¬ÈÏÑ¡ÖĞASCII
-	transmitterFormatLayout->addWidget(transmitterHex); // 16½øÖÆ·¢ËÍ
-	transmitterOptionsLayout->addWidget(transmitterNewLine); // ×Ô¶¯»»ĞĞ
-	transmitterNewLine->setChecked(true); // Ä¬ÈÏ×Ô¶¯»»ĞĞ
+	transmitterFormatLayout->addWidget(transmitterAscii); // ASCIIå‘é€
+	//transmitterAscii->setChecked(true); // é»˜è®¤é€‰ä¸­ASCII
+	transmitterFormatLayout->addWidget(transmitterHex); // 16è¿›åˆ¶å‘é€
+	transmitterHex->setChecked(true);
+	transmitterOptionsLayout->addWidget(transmitterNewLine); // è‡ªåŠ¨æ¢è¡Œ
+	//transmitterNewLine->setChecked(true); // é»˜è®¤è‡ªåŠ¨æ¢è¡Œ
+	transmitterOptionsLayout->addWidget(transmitterAutoQA); // è‡ªåŠ¨åº”ç­”
 	transmitterOptionsLayout->addLayout(transmitterAutoLayout);
-	transmitterAutoLayout->addWidget(transmitterAuto); // ¶¨Ê±·¢ËÍ
-	transmitterAutoLayout->addStretch(); // Ôö¼Ó¼ä¸ô
-	transmitterAutoLayout->addWidget(transmitterEvery); // Ã¿¸ô
-	transmitterAutoLayout->addWidget(transmitterPeriod); // ÖÜÆÚ
-	transmitterPeriod->setText("1000"); // Ä¬ÈÏÖÜÆÚ1000ºÁÃë
-	transmitterPeriod->setAlignment(Qt::AlignCenter); // ¾ÓÖĞÏÔÊ¾
-	transmitterPeriod->setValidator(transmitterPeriodValidator); // Ö»ÄÜÊäÈë1ÖÁ4Î»Êı×Ö
-	transmitterAutoLayout->addWidget(transmitterMs); // ºÁÃë
-	transmitterOptionsLayout->addWidget(transmitterTransmit); // ·¢ËÍ
+	transmitterAutoLayout->addWidget(transmitterAuto); // å®šæ—¶å‘é€
+	transmitterAutoLayout->addStretch(); // å¢åŠ é—´éš”
+	transmitterAutoLayout->addWidget(transmitterEvery); // æ¯éš”
+	transmitterAutoLayout->addWidget(transmitterPeriod); // å‘¨æœŸ
+	transmitterPeriod->setText("1000"); // é»˜è®¤å‘¨æœŸ1000æ¯«ç§’
+	transmitterPeriod->setAlignment(Qt::AlignCenter); // å±…ä¸­æ˜¾ç¤º
+	transmitterPeriod->setValidator(transmitterPeriodValidator); // åªèƒ½è¾“å…¥1è‡³4ä½æ•°å­—
+	transmitterAutoLayout->addWidget(transmitterMs); // æ¯«ç§’
+	transmitterOptionsLayout->addWidget(transmitterTransmit); // å‘é€
 
-	/* ¼ÆÊıÇø */
+	/* è®¡æ•°åŒº */
 	countBytesLayout->addLayout(countReceivedLayout);
-	countReceivedLayout->addWidget(receivedBytes); // ÊÕµ½×Ö½ÚÊı
-	countReceivedLayout->addWidget(resetReceived); // ÊÕµ½×Ö½ÚÊı¸´Î»
+	countReceivedLayout->addWidget(receivedBytes); // æ”¶åˆ°å­—èŠ‚æ•°
+	countReceivedLayout->addWidget(resetReceived); // æ”¶åˆ°å­—èŠ‚æ•°å¤ä½
 	countBytesLayout->addLayout(countTransmittedLayout);
-	countTransmittedLayout->addWidget(transmittedBytes); // ·¢³ö×Ö½ÚÊı
-	countTransmittedLayout->addWidget(resetTransmitted); // ·¢³ö×Ö½ÚÊı¸´Î»
-	countBytesLayout->addWidget(resetBoth); // È«²¿¸´Î»
+	countTransmittedLayout->addWidget(transmittedBytes); // å‘å‡ºå­—èŠ‚æ•°
+	countTransmittedLayout->addWidget(resetTransmitted); // å‘å‡ºå­—èŠ‚æ•°å¤ä½
+	countBytesLayout->addWidget(resetBoth); // å…¨éƒ¨å¤ä½
 }
 
 void UI_UartAssist::InitStyle(QMainWindow *mainWindow) {
 	desktop = QApplication::desktop();
-	mainWindow->setMinimumHeight(desktop->availableGeometry().height() * 0.9); // ¸ß¶È
-	mainWindow->setMinimumWidth(desktop->availableGeometry().width() * 0.7); // ¿í¶È
+	mainWindow->setMinimumHeight(desktop->availableGeometry().height() * 0.9); // é«˜åº¦
+	mainWindow->setMinimumWidth(desktop->availableGeometry().width() * 0.7); // å®½åº¦
 
 	receiverArea->setObjectName("receiverArea");
 	transmitterArea->setObjectName("transmitterArea");

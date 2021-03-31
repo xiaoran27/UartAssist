@@ -1,4 +1,4 @@
-#ifndef UARTASSIST_H
+﻿#ifndef UARTASSIST_H
 #define UARTASSIST_H
 
 #include <qbytearray.h>
@@ -14,7 +14,10 @@
 #include <qtextstream.h>
 #include <qtimer.h>
 #include <qtooltip.h>
+#include <qmap.h>
+#include <qqueue.h>
 #include "ui_UartAssist.h"
+#include "AutoQA.h"
 
 class UartAssist : public QMainWindow { Q_OBJECT
 public:
@@ -35,6 +38,10 @@ private:
 	QSerialPort *currentSerialPort;
 	QTimer *receiverTimer;
 	QTimer *transmitterTimer;
+
+	AutoQA *autoqa;
+	QQueue<QByteArray> *autoqaQQueue;
+	QTimer *autoqaTimer;
 };
 
 #endif

@@ -1,17 +1,21 @@
-#include "UartAssist.h"
+ï»¿#include "UartAssist.h"
 
 UartAssist::UartAssist(QWidget *parent) : QMainWindow(parent) {
 	ui = new UI_UartAssist(this);
-	ui->InitUI(this); // ³õÊ¼»¯½çÃæ
+	ui->InitUI(this); // åˆå§‹åŒ–ç•Œé¢
 	this->show();
 
 	currentSerialPort = new QSerialPort(this);
 	receiverTimer = new QTimer(this);
 	transmitterTimer = new QTimer(this);
 
-	InitSettings(); // ³õÊ¼»¯²ÎÊıÉèÖÃ
-	InitSignalsAndSlots(); // ³õÊ¼»¯ĞÅºÅºÍ²Û
-	InitEventFilter(); // ³õÊ¼»¯ÊÂ¼ş¹ıÂË
+	autoqa = new AutoQA();
+	autoqaQQueue = new QQueue<QByteArray>();
+	autoqaTimer = new QTimer();
+
+	InitSettings(); // åˆå§‹åŒ–å‚æ•°è®¾ç½®
+	InitSignalsAndSlots(); // åˆå§‹åŒ–ä¿¡å·å’Œæ§½
+	InitEventFilter(); // åˆå§‹åŒ–äº‹ä»¶è¿‡æ»¤
 }
 
 UartAssist::~UartAssist(void) {
@@ -54,47 +58,47 @@ bool UartAssist::eventFilter(QObject *obj, QEvent *e) {
 void UartAssist::InitSettings(void) {
 	currentUartState = UartState::OFF;
 
-	/* ËùÓĞµ±Ç°¿ÉÓÃµÄ´®¿Ú */
+	/* æ‰€æœ‰å½“å‰å¯ç”¨çš„ä¸²å£ */
 	ui->settingCOM->clear();
 	foreach (auto const &info, QSerialPortInfo::availablePorts())
 		ui->settingCOM->addItem(info.portName() + ": " + info.description());
 	ui->settingCOM->setCurrentIndex(0);
 	ui->settingCOM->setToolTip(ui->settingCOM->currentText());
 
-	/* ²¨ÌØÂÊ */
+	/* æ³¢ç‰¹ç‡ */
 	ui->settingBaudRate->clear();
 	foreach (auto const &baudRate, QSerialPortInfo::standardBaudRates())
 		ui->settingBaudRate->addItem(QString::number(baudRate));
-	ui->settingBaudRate->setCurrentText("115200"); // Ä¬ÈÏ²¨ÌØÂÊ115200
+	ui->settingBaudRate->setCurrentText("9600"); // é»˜è®¤æ³¢ç‰¹ç‡9600
 
-	/* Á÷¿ØÖÆ */
+	/* æµæ§åˆ¶ */
 	ui->settingFlowCtrl->clear();
 	ui->settingFlowCtrl->addItem(tr("No Flow Control"));
 	ui->settingFlowCtrl->addItem(tr("Hardware Flow Control"));
 	ui->settingFlowCtrl->addItem(tr("Software Flow Control"));
-	ui->settingFlowCtrl->setCurrentText(tr("No Flow Control")); // Ä¬ÈÏÎŞÁ÷¿ØÖÆ
+	ui->settingFlowCtrl->setCurrentText(tr("No Flow Control")); // é»˜è®¤æ— æµæ§åˆ¶
 
-	/* Êı¾İÎ» */
+	/* æ•°æ®ä½ */
 	ui->settingDataBits->clear();
 	ui->settingDataBits->addItem("5");
 	ui->settingDataBits->addItem("6");
 	ui->settingDataBits->addItem("7");
 	ui->settingDataBits->addItem("8");
-	ui->settingDataBits->setCurrentText("8"); // Ä¬ÈÏ8Î»Êı¾İÎ»
+	ui->settingDataBits->setCurrentText("8"); // é»˜è®¤8ä½æ•°æ®ä½
 
-	/* Í£Ö¹Î» */
+	/* åœæ­¢ä½ */
 	ui->settingStopBits->clear();
 	ui->settingStopBits->addItem("1");
 	ui->settingStopBits->addItem("1.5");
 	ui->settingStopBits->addItem("2");
-	ui->settingStopBits->setCurrentText("1"); // Ä¬ÈÏ1Î»Í£Ö¹Î»
+	ui->settingStopBits->setCurrentText("1"); // é»˜è®¤1ä½åœæ­¢ä½
 
-	/* ÆæÅ¼Ğ£Ñé */
+	/* å¥‡å¶æ ¡éªŒ */
 	ui->settingParity->clear();
 	ui->settingParity->addItem(tr("No Parity"));
 	ui->settingParity->addItem(tr("Even"));
 	ui->settingParity->addItem(tr("Odd"));
-	ui->settingParity->setCurrentText(tr("No Parity")); // Ä¬ÈÏÎŞÆæÅ¼Ğ£Ñé
+	ui->settingParity->setCurrentText(tr("No Parity")); // é»˜è®¤æ— å¥‡å¶æ ¡éªŒ
 
 	receiverTimer->setInterval(0);
 	if (!ui->transmitterPeriod->text().isEmpty())
@@ -123,6 +127,8 @@ void UartAssist::InitSignalsAndSlots(void) {
 			currentUartState = UartState::OFF;
 			receiverTimer->stop();
 			transmitterTimer->stop();
+			autoqaQQueue->clear();
+			autoqaTimer->stop();
 			ui->uartOnOff->setText(tr("Turn On"));
 		}
 		else {
@@ -204,8 +210,9 @@ void UartAssist::InitSignalsAndSlots(void) {
 			if (data.isEmpty()) return;
 
 			ui->receiverArea->moveCursor(QTextCursor::End);
+			ui->receiverArea->insertPlainText("\n\r");
 			if (ui->receiverShowTime->isChecked())
-				ui->receiverArea->insertPlainText(QTime::currentTime().toString("[HH:mm:ss.zzz] "));
+				ui->receiverArea->insertPlainText(QDateTime::currentDateTime().toString("[yyyy-MM-dd HH:mm:ss.zzz] RCV>"));
 
 			if (ui->receiverAscii->isChecked()) {
 				ui->receiverArea->insertPlainText(QString::fromUtf8(data));
@@ -220,6 +227,12 @@ void UartAssist::InitSignalsAndSlots(void) {
 			QRegExp rx("\\d+");
 			rx.indexIn(ui->receivedBytes->text());
 			ui->receivedBytes->setText(ui->receivedBytes->text().replace(rx, QString::number(rx.cap().toInt() + data.size())));
+
+			//auto answer
+			QByteArrayList alist = autoqa->getAnwser(data);
+			if (!alist.isEmpty()) {
+				autoqaQQueue->append(alist);
+			}
 		}
 	});
 
@@ -229,19 +242,68 @@ void UartAssist::InitSignalsAndSlots(void) {
 		else
 			transmitterTimer->stop();
 	});
+	connect(ui->transmitterAutoQA, &QCheckBox::toggled, [this](bool checked) {
+		if (checked) {
+			//load from file
+			QString filename = QFileDialog::getOpenFileName(this, tr("Open"), "./", "*.txt;;*.qa");
+			autoqa->load(filename);
+			//autoqa->loadX(filename);
+			autoqaTimer->setInterval(autoqa->getSleep());
+			autoqaTimer->start();
+		}
+		else {
+			autoqa->reset();
+			autoqaQQueue->clear();
+			autoqaTimer->stop();
+		}
+	});
+	connect(autoqaTimer, &QTimer::timeout, [this] {
+		if (currentSerialPort->isWritable()) {
+			if (autoqaQQueue->isEmpty()) {
+				return;
+			} 
+			QByteArray data = autoqaQQueue->dequeue();
+			if (data.isEmpty()) return;
+
+			ui->receiverArea->moveCursor(QTextCursor::End);
+			ui->receiverArea->insertPlainText("\n\r");
+			if (ui->receiverShowTime->isChecked())
+				ui->receiverArea->insertPlainText(QDateTime::currentDateTime().toString("[yyyy-MM-dd HH:mm:ss.zzz] SND>"));
+
+			if (autoqa->getMessageType() == AutoQA::MessageType::STRING ) {
+				ui->receiverArea->insertPlainText(QString::fromUtf8(data));
+			}
+			else {
+				ui->receiverArea->insertPlainText(QString::fromUtf8(data.toHex(' ').toUpper()));
+			}
+			currentSerialPort->write(data);
+
+			QRegExp rx("\\d+");
+			rx.indexIn(ui->transmittedBytes->text());
+			ui->transmittedBytes->setText(ui->transmittedBytes->text().replace(rx, QString::number(rx.cap().toInt() + data.size())));
+		}
+	});
 	connect(ui->transmitterPeriod, &QLineEdit::editingFinished, [this] {
 		transmitterTimer->setInterval(ui->transmitterPeriod->text().toInt());
 	});
 	connect(ui->transmitterTransmit, &QPushButton::clicked, [this] {
 		if (currentSerialPort->isWritable()) {
 			if (ui->transmitterArea->currentWidget() == ui->transmitOne) {
+
+				ui->receiverArea->moveCursor(QTextCursor::End);
+				ui->receiverArea->insertPlainText("\n\r");
+				if (ui->receiverShowTime->isChecked())
+					ui->receiverArea->insertPlainText(QDateTime::currentDateTime().toString("[yyyy-MM-dd HH:mm:ss.zzz] SND>"));
+
 				QByteArray data = ui->transmitOne->toPlainText().replace(QRegExp("\\r\\n|\\r|\\n"), "\r\n").toUtf8();
 				if (ui->transmitterAscii->isChecked()) {
 					if (ui->transmitterNewLine->isChecked()) data += "\r\n";
+					ui->receiverArea->insertPlainText(QString::fromUtf8(data));
 				}
 				else {
 					if (ui->transmitterNewLine->isChecked()) data += "0D0A";
 					data = QByteArray::fromHex(data);
+					ui->receiverArea->insertPlainText(QString::fromUtf8(data.toHex(' ').toUpper()));
 				}
 				currentSerialPort->write(data);
 
@@ -272,13 +334,20 @@ void UartAssist::InitSignalsAndSlots(void) {
 		for (int col = 0; col < ui->transmitMore->columnCount(); col += 3)
 			connect(static_cast<QPushButton *>(ui->transmitMore->cellWidget(row, col + 2)), &QPushButton::clicked, [this, row, col] {
 				if (currentSerialPort->isWritable()) {
+					ui->receiverArea->moveCursor(QTextCursor::End);
+					ui->receiverArea->insertPlainText("\n\r");
+					if (ui->receiverShowTime->isChecked())
+						ui->receiverArea->insertPlainText(QDateTime::currentDateTime().toString("[yyyy-MM-dd HH:mm:ss.zzz] SND>"));
+
 					QByteArray data = static_cast<QLineEdit *>(ui->transmitMore->cellWidget(row, col + 1))->text().toUtf8();
 					if (ui->transmitterAscii->isChecked()) {
 						if (ui->transmitterNewLine->isChecked()) data += "\r\n";
+						ui->receiverArea->insertPlainText(QString::fromUtf8(data));
 					}
 					else {
 						if (ui->transmitterNewLine->isChecked()) data += "0D0A";
 						data = QByteArray::fromHex(data);
+						ui->receiverArea->insertPlainText(QString::fromUtf8(data.toHex(' ').toUpper()));
 					}
 					currentSerialPort->write(data);
 
@@ -293,3 +362,6 @@ void UartAssist::InitEventFilter(void) {
 	ui->transmitOne->installEventFilter(this);
 	ui->transmitMore->installEventFilter(this);
 }
+
+
+
