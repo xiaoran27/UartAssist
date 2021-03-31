@@ -18,7 +18,7 @@ public:
 	void load( QString filename = "autoqa.txt" );
 	void reset();
 	void loadX(QString filename = "autoqa.txt");
-	QByteArrayList getAnwser(QByteArray q);
+	QByteArrayList getAnwser(QByteArray q = QString("").toUtf8());
 	int getSleep();
 	MessageType getMessageType();
 

@@ -6,13 +6,13 @@ int AutoQA::append(QStringList qlist, QStringList alist, int sleepMs)
 	QByteArrayList lstrsp;
 	for each (QString e in alist)
 	{
-		QString val = e.mid(1);
-		if (val.trimmed().startsWith("hex:", Qt::CaseInsensitive)) {
-			val = val.trimmed().mid(4).replace(" ", "");
+		QString val = e.mid(1).trimmed();
+		if (val.startsWith("hex:", Qt::CaseInsensitive)) {
+			val = val.mid(4).replace(" ", "");
 		}
 		if (val.length() < 1) continue;
 		if ( msgtype == MessageType::STRING) {
-			lstrsp.append(e.length()-val.length()>1? QByteArray::fromHex(val.toUtf8()):val.toUtf8());
+			lstrsp.append(e.length()-val.length()>4? QByteArray::fromHex(val.toUtf8()):val.toUtf8());
 		}
 		else {
 			lstrsp.append(QByteArray::fromHex(val.toUtf8()));
@@ -21,12 +21,12 @@ int AutoQA::append(QStringList qlist, QStringList alist, int sleepMs)
 
 	for each (QString e in qlist)
 	{
-		QString val = e.mid(1);
-		if (val.trimmed().startsWith("hex:", Qt::CaseInsensitive)) {
-			val = val.trimmed().mid(4).replace(" ", "");
+		QString val = e.mid(1).trimmed();
+		if (val.startsWith("hex:", Qt::CaseInsensitive)) {
+			val = val.mid(4).replace(" ", "");
 		}
 		if (msgtype == MessageType::STRING) {
-			autoqaMap->insert((e.length() - val.length() > 1 ? QByteArray::fromHex(val.toUtf8()) : val.toUtf8()), lstrsp);
+			autoqaMap->insert((e.length() - val.length() > 4 ? QByteArray::fromHex(val.toUtf8()) : val.toUtf8()), lstrsp);
 		}
 		else {
 			autoqaMap->insert(QByteArray::fromHex(val.toUtf8()), lstrsp);

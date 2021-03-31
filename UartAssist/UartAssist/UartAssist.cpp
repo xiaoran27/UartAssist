@@ -160,6 +160,11 @@ void UartAssist::InitSignalsAndSlots(void) {
 				if (ui->transmitterAuto->isChecked())
 					transmitterTimer->start();
 				ui->uartOnOff->setText(tr("Turn Off"));
+
+				QByteArrayList alist = autoqa->getAnwser();
+				if (!alist.isEmpty()) {
+					autoqaQQueue->append(alist);
+				}
 			}
 			else {
 				QMessageBox::critical(this, tr("Error"), tr("Fail to turn on this device!"));
@@ -207,7 +212,9 @@ void UartAssist::InitSignalsAndSlots(void) {
 	connect(receiverTimer, &QTimer::timeout, [this] {
 		if (currentSerialPort->isReadable()) {
 			QByteArray data = currentSerialPort->readAll();
-			if (data.isEmpty()) return;
+			if (data.isEmpty()) {
+				return; 
+			}
 
 			ui->receiverArea->moveCursor(QTextCursor::End);
 			ui->receiverArea->insertPlainText("\n\r");
