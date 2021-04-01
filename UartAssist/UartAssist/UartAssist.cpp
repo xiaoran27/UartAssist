@@ -258,11 +258,15 @@ void UartAssist::InitSignalsAndSlots(void) {
 			//autoqa->loadX(filename);
 			autoqaTimer->setInterval(autoqa->getSleep());
 			autoqaTimer->start();
+
+			this->setWindowTitle(this->windowTitle()+" "+filename);
 		}
 		else {
 			autoqa->reset();
 			autoqaQQueue->clear();
 			autoqaTimer->stop();
+
+			this->setWindowTitle(this->windowTitle().split(" ").at(0));
 		}
 	});
 	connect(autoqaTimer, &QTimer::timeout, [this] {
