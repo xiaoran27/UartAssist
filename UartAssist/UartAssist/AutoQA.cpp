@@ -46,7 +46,7 @@ int AutoQA::append(QString same, int sleepMs)
 	return append({ same }, { same }, sleepMs);
 }
 
-//为保证qalist的有序，故分拆其到qlist和alist中, 所有忽略qalist的值.
+//为保证qalist的有序，故分拆其到qlist和alist中, 所以忽略qalist的值.
 int AutoQA::judge(QStringList qlist, QStringList alist, QStringList qalist, int sleepMs)
 {
 	if ( alist.isEmpty()) return 0;
@@ -224,12 +224,12 @@ void AutoQA::load(QString filename)
 		}
 
 		switch (line.at(0).toLatin1()) {
-		case '>':
+		case '<':
 		{
-			if (!alist.isEmpty()) { //有<或=应答
+			if (!alist.isEmpty()) { //有>或=应答
 
 				if (qlist.isEmpty()) {
-					qlist << ">";
+					qlist << "<";
 				}
 				count = append(qlist, alist, sleepMs);
 				qlist.clear();
@@ -239,7 +239,7 @@ void AutoQA::load(QString filename)
 			qlist << line;
 			break;
 		}
-		case '<':
+		case '>':
 		{
 			alist << line;
 			break;
@@ -248,7 +248,7 @@ void AutoQA::load(QString filename)
 		{
 			if (!alist.isEmpty()) { //有<或=应答
 				if (qlist.isEmpty()) {
-					qlist << ">";
+					qlist << "<";
 				}
 				count = append(qlist, alist, sleepMs);
 				qlist.clear();
@@ -299,10 +299,10 @@ void AutoQA::load(QString filename)
 	}  //end while
 	qafile.close();
 
-	if (!alist.isEmpty()) { //有<或=应答
+	if (!alist.isEmpty()) { //有>或=应答
 
 		if (qlist.isEmpty()) { 
-			qlist << ">";
+			qlist << "<";
 		}
 		count = append(qlist, alist);
 		qlist.clear();
@@ -339,9 +339,9 @@ void AutoQA::loadX(QString filename)
 
 		//TODO: [01F]{3}
 		switch (line.at(0).toLatin1()) {
-		case '>':
+		case '<':
 		{
-			if (!alist.isEmpty() || !qalist.isEmpty()) { //有<或=应答
+			if (!alist.isEmpty() || !qalist.isEmpty()) { //有>或=应答
 				count = judge(qlist, alist, qalist, sleepMs);
 				qlist.clear();
 				alist.clear();
@@ -351,7 +351,7 @@ void AutoQA::loadX(QString filename)
 			qlist << line;
 			break;
 		}
-		case '<':
+		case '>':
 		{
 			alist << line;
 			break;

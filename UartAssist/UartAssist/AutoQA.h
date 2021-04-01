@@ -17,7 +17,7 @@ public:
 	enum MessageType { STRING, HEX };
 	void load( QString filename = "autoqa.txt" );
 	void reset();
-	void loadX(QString filename = "autoqa.txt");
+	void loadX(QString filename = "autoqa.txt");  // Deprecated
 	QByteArrayList getAnwser(QByteArray q = QString("").toUtf8());
 	int getSleep();
 	MessageType getMessageType();
@@ -29,7 +29,7 @@ private:
 	int append(QStringList qlist, QStringList alist, int sleepMs = 100);
 	int append(QStringList qalist, int sleepMs = 100);
 	int append(QString same, int sleepMs = 100);
-	int judge(QStringList qlist, QStringList alist, QStringList qalist, int sleepMs = 100);
+	int judge(QStringList qlist, QStringList alist, QStringList qalist, int sleepMs = 100);  // Deprecated
 
 
 };

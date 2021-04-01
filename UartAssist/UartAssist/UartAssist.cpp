@@ -219,7 +219,8 @@ void UartAssist::InitSignalsAndSlots(void) {
 			ui->receiverArea->moveCursor(QTextCursor::End);
 			ui->receiverArea->insertPlainText("\n\r");
 			if (ui->receiverShowTime->isChecked())
-				ui->receiverArea->insertPlainText(QDateTime::currentDateTime().toString("[yyyy-MM-dd HH:mm:ss.zzz] RCV>"));
+				ui->receiverArea->insertPlainText(QDateTime::currentDateTime().toString("[yyyy-MM-dd HH:mm:ss.zzz] "));
+			ui->receiverArea->insertPlainText("RCV< ");
 
 			if (ui->receiverAscii->isChecked()) {
 				ui->receiverArea->insertPlainText(QString::fromUtf8(data));
@@ -275,7 +276,8 @@ void UartAssist::InitSignalsAndSlots(void) {
 			ui->receiverArea->moveCursor(QTextCursor::End);
 			ui->receiverArea->insertPlainText("\n\r");
 			if (ui->receiverShowTime->isChecked())
-				ui->receiverArea->insertPlainText(QDateTime::currentDateTime().toString("[yyyy-MM-dd HH:mm:ss.zzz] SND>"));
+				ui->receiverArea->insertPlainText(QDateTime::currentDateTime().toString("[yyyy-MM-dd HH:mm:ss.zzz] "));
+			ui->receiverArea->insertPlainText("SND> ");
 
 			if (autoqa->getMessageType() == AutoQA::MessageType::STRING ) {
 				ui->receiverArea->insertPlainText(QString::fromUtf8(data));
@@ -300,7 +302,8 @@ void UartAssist::InitSignalsAndSlots(void) {
 				ui->receiverArea->moveCursor(QTextCursor::End);
 				ui->receiverArea->insertPlainText("\n\r");
 				if (ui->receiverShowTime->isChecked())
-					ui->receiverArea->insertPlainText(QDateTime::currentDateTime().toString("[yyyy-MM-dd HH:mm:ss.zzz] SND>"));
+					ui->receiverArea->insertPlainText(QDateTime::currentDateTime().toString("[yyyy-MM-dd HH:mm:ss.zzz] "));
+				ui->receiverArea->insertPlainText("SND> ");
 
 				QByteArray data = ui->transmitOne->toPlainText().replace(QRegExp("\\r\\n|\\r|\\n"), "\r\n").toUtf8();
 				if (ui->transmitterAscii->isChecked()) {
@@ -344,7 +347,8 @@ void UartAssist::InitSignalsAndSlots(void) {
 					ui->receiverArea->moveCursor(QTextCursor::End);
 					ui->receiverArea->insertPlainText("\n\r");
 					if (ui->receiverShowTime->isChecked())
-						ui->receiverArea->insertPlainText(QDateTime::currentDateTime().toString("[yyyy-MM-dd HH:mm:ss.zzz] SND>"));
+						ui->receiverArea->insertPlainText(QDateTime::currentDateTime().toString("[yyyy-MM-dd HH:mm:ss.zzz] "));
+					ui->receiverArea->insertPlainText("SND> ");
 
 					QByteArray data = static_cast<QLineEdit *>(ui->transmitMore->cellWidget(row, col + 1))->text().toUtf8();
 					if (ui->transmitterAscii->isChecked()) {
